@@ -33,7 +33,7 @@ A new Discord token stealer/worm that can spread itself.
   
 >Go to bin>debug folder to get the executable.
 
->NOTE: Make sure you have [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/) and [.NET Framework 4.7.2](https://dotnet.microsoft.com/en-us/download/dotnet-framework) and above installed.
+>NOTE: Make sure you have [Visual Studio 2019 or Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) and [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework) installed.
 
 ---
 ### TrickOrTreat is licensed under the GNU General Public License v3.0. See the [LICENSE](https://github.com/extatent/TrickOrTreat/blob/main/LICENSE) file for details.
