@@ -11,8 +11,6 @@ A new Discord token stealer/worm that can spread itself.
 ---
 
 **NOTE:** ⭐ If you like the project, feel free to star it ⭐
-  
-### Most likely I won't add new features, if you want to do so, fork the project. This is just an example of how the new token encryption works and a way to spread.
 
 #### Features:
 - Classic Mode (Sends only the Discord token and IP address in an non-embedded format.)
