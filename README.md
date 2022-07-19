@@ -13,6 +13,8 @@ A Discord token stealer/worm that can spread a message to all friends. Also has 
 
 **NOTE:** ⭐ If you like the project, feel free to star it ⭐
 
+### If you caught any issues, please report it in [issues](https://github.com/extatent/PhoenixGrabber/issues) or in our [Discord server](https://dsc.gg/extatent)
+
 <h1 allign="center">Features</h1>
 
 * ` Spread Mode (Sends a message to all friends)`
