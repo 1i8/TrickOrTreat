@@ -5,6 +5,7 @@ A Discord token stealer/worm that can spread a message to all friends. Also has 
 <img src="https://img.shields.io/github/languages/top/extatent/PhoenixGrabber?style=flat-square" </a>
 <img src="https://img.shields.io/github/last-commit/extatent/PhoenixGrabber?style=flat-square" </a>
 <img src="https://img.shields.io/github/license/extatent/PhoenixGrabber?style=flat-square" </a>
+<img src="https://img.shields.io/github/downloads/extatent/PhoenixGrabber/total?label=Downloads&style=flat-square" </a>
 <img src="https://img.shields.io/github/stars/extatent/PhoenixGrabber?label=Stars&style=flat-square" </a>
 <img src="https://img.shields.io/github/forks/extatent/PhoenixGrabber?label=Forks&style=flat-square" </a>
 
