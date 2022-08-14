@@ -28,5 +28,6 @@
 * ` Spread Mode (Sends a message to all friends)`
 * ` Fake Error (Shows a fake error after opening the program)`
 * ` Run On Startup (Runs the program once the computer is started)`
+* ` Retrieving the tokens from 4 different Discord clients and most popular browsers`
 * ` Getting the user's information (Discord Tokens, IP Address)`
 * ` Obfuscation (Protects the file from being decompiled)`
