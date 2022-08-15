@@ -44,6 +44,8 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -64,6 +66,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\VMProtect_Con.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BouncyCastle.Crypto.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
