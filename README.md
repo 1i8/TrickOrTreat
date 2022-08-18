@@ -9,8 +9,12 @@
 ---
 
 > If you like the project, consider dropping a star ⭐
-  
-> If you caught any issues, please report it in [issues](https://github.com/extatent/PhoenixGrabber/issues) or in our [Discord server](https://dsc.gg/extatent)
+    
+> If you caught any issues, please report it in [issues](https://github.com/extatent/PhoenixGrabber/issues) or in our [Discord server](https://dsc.gg/extatent) (Specify **"Phoenix Grabber"** in the ticket)
+
+> Tickets like **"how to use"**, **"I need help"**, **"not working"** will be ignored and deleted. Provide specific information.
+
+> Become a contributor by forking the project and opening a new pull request or [suggest new features](https://dsc.gg/extatent).
 
 <details>
 <summary>Preview</summary>
@@ -28,6 +32,6 @@
 * ` Spread Mode (Sends a message to all friends)`
 * ` Fake Error (Shows a fake error after opening the program)`
 * ` Run On Startup (Runs the program once the computer is started)`
-* ` Retrieving the tokens from 4 different Discord clients and most popular browsers`
-* ` Getting the user's information (Discord Tokens, IP Address)`
+* ` Retrieving the tokens from 4 different Discord clients and popular browsers`
+* ` Getting the user's information (Discord Tokens, Email, Phone Number, Status, IP Address, Computer Name)`
 * ` Obfuscation (Protects the file from being decompiled)`
