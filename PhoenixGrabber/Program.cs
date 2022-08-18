@@ -123,9 +123,11 @@ namespace PhoenixGrabber
             compars.GenerateInMemory = false;
             compars.TreatWarningsAsErrors = false;
             compars.CompilerOptions += "/t:winexe /unsafe /platform:x86";
-            if (FileName.Contains(" ")) { FileName = FileName.Replace(" ", "_"); }
             if (Obfuscate == true)
+            {
+                if (FileName.Contains(" ")) { FileName = FileName.Replace(" ", "_"); }
                 compars.OutputAssembly = Path.GetTempPath() + $"\\{FileName}.exe";
+            }
             else
                 compars.OutputAssembly = Directory.GetCurrentDirectory() + $"\\{FileName}.exe";
             CompilerResults res = provider.CompileAssemblyFromSource(compars, code.ToArray());

