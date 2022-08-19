@@ -18,7 +18,7 @@
 
 <details>
 <summary>Preview</summary>
-<img src="https://i.imgur.com/28CXMrv.png" alt="png">
+<img src="https://i.imgur.com/49QShHc.png" alt="png">
 
 #### Obfuscation
 
