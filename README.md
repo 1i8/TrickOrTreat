@@ -10,11 +10,7 @@
 
 > If you like the project, consider dropping a star ⭐
     
-> If you caught any issues, please report it in [issues](https://github.com/extatent/PhoenixGrabber/issues) or in our [Discord server](https://dsc.gg/extatent) (Specify **"Phoenix Grabber"** in the ticket)
-
-> Tickets like **"how to use"**, **"I need help"**, **"not working"** will be ignored and deleted. Provide specific information.
-
-> Become a contributor by forking the project and opening a new pull request or [suggest new features](https://dsc.gg/extatent).
+> If you caught any issues, please report it in [issues](https://github.com/extatent/PhoenixGrabber/issues).
 
 <details>
 <summary>Preview</summary>
